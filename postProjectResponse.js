@@ -97,10 +97,8 @@ if (!message) {
       }
 
       if (offerButton) {
-        console.log(JSON.stringify({ message: "Bouton trouvé, clic en cours..." }));
         await offerButton.click();
         await new Promise(resolve => setTimeout(resolve, 3000));
-        console.log(JSON.stringify({ message: "Clic effectué, attente du formulaire..." }));
       } else {
         console.log(JSON.stringify({ error: "Impossible de trouver le bouton 'Faire une offre'" }));
         return;
@@ -112,57 +110,43 @@ if (!message) {
       // Remplir le champ montant
       const amountInput = await page.$('input[name="offer[amount]"]');
       if (amountInput) {
-        console.log(JSON.stringify({ message: "Champ montant trouvé, remplissage en cours..." }));
         await amountInput.click();
         await amountInput.evaluate(input => input.value = ''); // Vider le champ
         await amountInput.type('42');
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Vérifier que la valeur a bien été saisie
-        const value = await amountInput.evaluate(input => input.value);
-        console.log(JSON.stringify({ message: `Valeur saisie: ${value}` }));
-
         // Remplir le champ délai
         const durationInput = await page.$('input[name="offer[duration]"]');
         if (durationInput) {
-          console.log(JSON.stringify({ message: "Champ délai trouvé, remplissage en cours..." }));
           await durationInput.click();
           await durationInput.evaluate(input => input.value = ''); // Vider le champ
           await durationInput.type('30');
           await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Vérifier que la valeur a bien été saisie
-          const durationValue = await durationInput.evaluate(input => input.value);
-          console.log(JSON.stringify({ message: `Délai saisi: ${durationValue}` }));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le champ délai" }));
+          return;
         }
 
         // Remplir le champ message
         const messageTextarea = await page.$('textarea[name="offer[comments_attributes][0][content]"]');
         if (messageTextarea) {
-          console.log(JSON.stringify({ message: "Champ message trouvé, remplissage en cours..." }));
           await messageTextarea.click();
           await messageTextarea.evaluate(textarea => textarea.value = ''); // Vider le champ
           await messageTextarea.type(message);
           await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Vérifier que le message a bien été saisi
-          const messageValue = await messageTextarea.evaluate(textarea => textarea.value);
-          console.log(JSON.stringify({ message: `Message saisi: ${messageValue.substring(0, 50)}...` }));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le champ message" }));
+          return;
         }
 
         // Cliquer sur le bouton "Publier mon offre"
         const submitButton = await page.$('input[type="submit"][value="Publier mon offre"]');
         if (submitButton) {
-          console.log(JSON.stringify({ message: "Bouton 'Publier mon offre' trouvé, envoi en cours..." }));
           await submitButton.click();
           await new Promise(resolve => setTimeout(resolve, 3000));
-          console.log(JSON.stringify({ message: "Offre publiée !" }));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le bouton 'Publier mon offre'" }));
+          return;
         }
 
         console.log(JSON.stringify({
