@@ -89,38 +89,35 @@ if (!message) {
       }
 
       if (!offerButton) {
-        // Dernière tentative avec evaluate
-        offerButton = await page.evaluate(() => {
-          const links = Array.from(document.querySelectorAll('a'));
-          return links.find(link => link.textContent.includes('Faire une offre'));
-        });
-      }
-
-      if (offerButton) {
-        await offerButton.click();
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      } else {
         console.log(JSON.stringify({ error: "Impossible de trouver le bouton 'Faire une offre'" }));
         return;
       }
 
+      // Attendre que le bouton soit cliquable
+      await page.waitForSelector('a[data-url*="/offers/new"]', { visible: true, timeout: 10000 });
+      await offerButton.click();
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Attendre plus longtemps
+
       // Attendre que le formulaire soit chargé
-      await page.waitForSelector('input[name="offer[amount]"]', { timeout: 10000 });
+      await page.waitForSelector('input[name="offer[amount]"]', { visible: true, timeout: 15000 });
 
       // Remplir le champ montant
       const amountInput = await page.$('input[name="offer[amount]"]');
       if (amountInput) {
-        await amountInput.click();
-        await amountInput.evaluate(input => input.value = ''); // Vider le champ
-        await amountInput.type('42');
+        // Attendre que le champ soit visible et cliquable
+        await page.waitForSelector('input[name="offer[amount]"]', { visible: true });
+        await page.focus('input[name="offer[amount]"]');
+        await page.evaluate(() => document.querySelector('input[name="offer[amount]"]').value = '');
+        await page.type('input[name="offer[amount]"]', '42');
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // Remplir le champ délai
         const durationInput = await page.$('input[name="offer[duration]"]');
         if (durationInput) {
-          await durationInput.click();
-          await durationInput.evaluate(input => input.value = ''); // Vider le champ
-          await durationInput.type('30');
+          await page.waitForSelector('input[name="offer[duration]"]', { visible: true });
+          await page.focus('input[name="offer[duration]"]');
+          await page.evaluate(() => document.querySelector('input[name="offer[duration]"]').value = '');
+          await page.type('input[name="offer[duration]"]', '30');
           await new Promise(resolve => setTimeout(resolve, 1000));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le champ délai" }));
@@ -130,10 +127,11 @@ if (!message) {
         // Remplir le champ message
         const messageTextarea = await page.$('textarea[name="offer[comments_attributes][0][content]"]');
         if (messageTextarea) {
-          await messageTextarea.click();
-          await messageTextarea.evaluate(textarea => textarea.value = ''); // Vider le champ
-          await messageTextarea.type(message);
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await page.waitForSelector('textarea[name="offer[comments_attributes][0][content]"]', { visible: true });
+          await page.focus('textarea[name="offer[comments_attributes][0][content]"]');
+          await page.evaluate(() => document.querySelector('textarea[name="offer[comments_attributes][0][content]"]').value = '');
+          await page.type('textarea[name="offer[comments_attributes][0][content]"]', message);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le champ message" }));
           return;
@@ -142,8 +140,12 @@ if (!message) {
         // Cliquer sur le bouton "Publier mon offre"
         const submitButton = await page.$('input[type="submit"][value="Publier mon offre"]');
         if (submitButton) {
-          await submitButton.click();
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await page.waitForSelector('input[type="submit"][value="Publier mon offre"]', { visible: true });
+          await page.evaluate(() => {
+            const btn = document.querySelector('input[type="submit"][value="Publier mon offre"]');
+            if (btn) btn.click();
+          });
+          await new Promise(resolve => setTimeout(resolve, 5000));
         } else {
           console.log(JSON.stringify({ error: "Impossible de trouver le bouton 'Publier mon offre'" }));
           return;
