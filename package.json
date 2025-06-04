@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "name": "codeur-scraper",
+  "version": "1.0.0",
+  "description": "API pour scraper les projets Codeur.com",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node getProjectInfos.js 455498-site-web-analyse-crypto"
+  },
+  "dependencies": {
+    "puppeteer": "^24.10.0",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
